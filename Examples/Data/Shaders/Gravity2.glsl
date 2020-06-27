@@ -13,7 +13,6 @@ uniform float CenterMass;
 uniform float TimeStep;
 uniform mat4 ModelViewProjectionMatrix;
 
-
 void main()
 {
 	// calculate acceleration by gravity G*m/r^2
