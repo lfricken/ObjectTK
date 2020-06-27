@@ -46,13 +46,16 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvancedExamples\LeonExample.cs" />
     <Compile Include="AdvancedExamples\FeedbackGravityExample.cs" />
     <Compile Include="AdvancedExamples\LoaderDDS.cs" />
     <Compile Include="AdvancedExamples\LoaderStatics.cs" />
     <Compile Include="AdvancedExamples\ParallaxMappingExample.cs" />
+    <Compile Include="AdvancedExamples\Shader.cs" />
     <Compile Include="BasicExamples\TextureGridExample.cs" />
     <Compile Include="BasicExamples\SkyboxExample.cs" />
     <Compile Include="ExampleProjectAttribute.cs" />
+    <Compile Include="Shaders\GravityProgram2.cs" />
     <Compile Include="Shaders\ParallaxProgram.cs" />
     <Compile Include="Shaders\SimpleColorProgram.cs" />
     <Compile Include="Shaders\SimpleTextureProgram.cs" />
@@ -75,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\Shaders\ExampleShader.glsl" />
+    <None Include="Data\Shaders\Gravity2.glsl" />
     <None Include="Data\Shaders\Gravity.glsl" />
     <None Include="Data\Shaders\Parallax.glsl" />
     <None Include="Data\Shaders\SimpleColor.glsl" />

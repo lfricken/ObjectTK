@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using Examples.Shaders;
 using ObjectTK.Buffers;
@@ -10,8 +12,8 @@ using OpenTK.Input;
 
 namespace Examples.AdvancedExamples
 {
-    [ExampleProject("Transform feedback with gravity simulation")]
-    public class FeedbackGravityExample
+    [ExampleProject("LeonExample")]
+    public class LeonExample
         : ExampleWindow
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -24,7 +26,7 @@ namespace Examples.AdvancedExamples
         }
 
         private readonly Random _random;
-        private GravityProgram _program;
+        private GravityProgram2 _program;
         private VertexArray _vao;
         private BufferPod<Particle> _buffers;
         private TransformFeedback _feedback;
@@ -33,7 +35,7 @@ namespace Examples.AdvancedExamples
         private float _centerMass = 0.85f; //0.65f;
         private int _particleCount = 650000;
 
-        public FeedbackGravityExample()
+        public LeonExample()
         {
             _random = new Random();
             Load += OnLoad;
@@ -50,9 +52,18 @@ namespace Examples.AdvancedExamples
         {
             // initialize shader (load sources, create/compile/link shader program, error checking)
             // when using the factory method the shader sources are retrieved from the ShaderSourceAttributes
-            _program = ProgramFactory.Create<GravityProgram>();
-            // this program will be used all the time so just activate it once and for all
-            _program.Use();
+
+            var pathToShaders = "Data\\Shaders\\";
+            var shaderExt = ".glsl";
+            var shaderCode = File.ReadAllLines(pathToShaders + "Gravity2" + shaderExt);
+
+            var vs = new Shader(shaderCode, ShaderType.VertexShader);
+
+            // TODO Bind stuff
+
+            GL.UseProgram(vs.Handle);
+
+            var fs = GL.CreateShader(ShaderType.FragmentShader);
 
             // create and bind a vertex array
             _vao = new VertexArray();

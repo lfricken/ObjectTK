@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTK", "ObjectTK\ObjectTK.csproj", "{0EE3347B-1BBE-44CA-8295-22DA13AE914A}"
 EndProject
@@ -15,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTK.Tools", "ObjectTK.Tools\ObjectTK.Tools.csproj", "{E38997F8-7ECE-4B35-BB94-7E609F68D217}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTK.Compiler", "ObjectTK.Compiler\ObjectTK.Compiler.csproj", "{ABD0BE84-792D-4F52-82E2-C869585B3C29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeonTest", "LeonTest\LeonTest.csproj", "{0C826D05-4CCA-46EB-A839-59FD7552C1BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,8 +40,15 @@ Global
 		{ABD0BE84-792D-4F52-82E2-C869585B3C29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABD0BE84-792D-4F52-82E2-C869585B3C29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABD0BE84-792D-4F52-82E2-C869585B3C29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C826D05-4CCA-46EB-A839-59FD7552C1BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C826D05-4CCA-46EB-A839-59FD7552C1BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C826D05-4CCA-46EB-A839-59FD7552C1BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C826D05-4CCA-46EB-A839-59FD7552C1BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4C3FB580-D07F-4F21-BD0B-4F3F6D688DD8}
 	EndGlobalSection
 EndGlobal
