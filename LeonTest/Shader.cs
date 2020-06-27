@@ -7,12 +7,12 @@ namespace Examples.AdvancedExamples
 {
     public class ShaderProgram : IDisposable
     {
-        public int Handle { get; protected set; }
+        public readonly int Handle;
         private List<int> shaders = new List<int>();
 
         public ShaderProgram()
         {
-
+            Handle = GL.CreateProgram();
         }
 
         public int GetLocation(string name)
@@ -25,7 +25,7 @@ namespace Examples.AdvancedExamples
         /// 
         /// </summary>
         /// <param name="shaderCode">
-        /// Each line of the source code. They do not need to end in newlines. 
+        /// Each line of the source code. They should not have newlines. 
         /// The 0th line should be the version
         /// The 1st line should be a comment so we can insert a #define for the type
         /// </param>
@@ -69,7 +69,7 @@ namespace Examples.AdvancedExamples
 
             foreach (var shader in shaders)
             {
-                GL.DeleteShader(shader);
+                // GL.DeleteShader(shader);
             }
             shaders.Clear();
         }

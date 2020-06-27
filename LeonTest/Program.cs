@@ -62,8 +62,8 @@ namespace LeonTest
             };
 
             readonly int[] indices = new int[] {  // note that we start from 0!
-                0, 1, 3,   // first triangle
-                3, 2, 1,   // second triangle
+                0, 1, 2,   // first triangle
+                0, 2, 3,   // second triangle
             };
 
             int VertexShader;
@@ -77,27 +77,12 @@ namespace LeonTest
             {
                 // shaders
                 {
-                    // Load the source of the vertex shader and compile it.
-                    VertexShader = GL.CreateShader(ShaderType.VertexShader);
-                    GL.ShaderSource(VertexShader, VertexShaderSource);
-                    GL.CompileShader(VertexShader);
+                    var shader = new ShaderProgram();
+                    shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
+                    shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
+                    shader.Link();
 
-                    // Load the source of the fragment shader and compile it.
-                    FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-                    GL.ShaderSource(FragmentShader, FragmentShaderSource);
-                    GL.CompileShader(FragmentShader);
-
-                    // Create the shader program, attach the vertex and fragment shaders and link the program.
-                    ShaderProgram = GL.CreateProgram();
-                    GL.AttachShader(ShaderProgram, VertexShader);
-                    GL.AttachShader(ShaderProgram, FragmentShader);
-                    GL.LinkProgram(ShaderProgram);
-                    //var shader = new ShaderProgram();
-                    //shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
-                    //shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
-                    //shader.Link();
-
-                    //ShaderProgram = shader.Handle;
+                    ShaderProgram = shader.Handle;
                 }
 
 
@@ -127,32 +112,32 @@ namespace LeonTest
 
 
                 // random examples
-                {
-                    int count;
-                    // read shader variables
-                    GL.GetProgramInterface(ShaderProgram, ProgramInterface.ProgramInput, ProgramInterfaceParameter.ActiveResources, out count);
-                    for (int i = 0; i < count; ++i)
-                    {
-                        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
-                    }
+                //{
+                //    int count;
+                //    // read shader variables
+                //    GL.GetProgramInterface(ShaderProgram, ProgramInterface.ProgramInput, ProgramInterfaceParameter.ActiveResources, out count);
+                //    for (int i = 0; i < count; ++i)
+                //    {
+                //        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
+                //    }
 
-                    GL.GetProgramInterface(ShaderProgram, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out count);
-                    for (int i = 0; i < count; ++i)
-                    {
-                        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
-                    }
+                //    GL.GetProgramInterface(ShaderProgram, ProgramInterface.Uniform, ProgramInterfaceParameter.ActiveResources, out count);
+                //    for (int i = 0; i < count; ++i)
+                //    {
+                //        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
+                //    }
 
-                    GL.GetProgramInterface(ShaderProgram, ProgramInterface.ShaderStorageBlock, ProgramInterfaceParameter.ActiveResources, out count);
-                    for (int i = 0; i < count; ++i)
-                    {
-                        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
-                    }
-                    GL.GetProgramInterface(ShaderProgram, ProgramInterface.UniformBlock, ProgramInterfaceParameter.ActiveResources, out count);
-                    for (int i = 0; i < count; ++i)
-                    {
-                        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
-                    }
-                }
+                //    GL.GetProgramInterface(ShaderProgram, ProgramInterface.ShaderStorageBlock, ProgramInterfaceParameter.ActiveResources, out count);
+                //    for (int i = 0; i < count; ++i)
+                //    {
+                //        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
+                //    }
+                //    GL.GetProgramInterface(ShaderProgram, ProgramInterface.UniformBlock, ProgramInterfaceParameter.ActiveResources, out count);
+                //    for (int i = 0; i < count; ++i)
+                //    {
+                //        GL.GetActiveAttrib(ShaderProgram, 0, 256, out int len, out var size, out var type, out string name);
+                //    }
+                //}
 
 
 
