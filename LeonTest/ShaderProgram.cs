@@ -14,10 +14,6 @@ namespace Examples.AdvancedExamples
         {
             Handle = GL.CreateProgram();
         }
-
-
-
-        bool _isDisposed;
         public void Dispose()
         {
             if (!_isDisposed)
@@ -31,6 +27,7 @@ namespace Examples.AdvancedExamples
             }
             _isDisposed = true;
         }
+        bool _isDisposed;
         ~ShaderProgram()
         {
             Trace.Assert(_isDisposed);
@@ -94,15 +91,12 @@ namespace Examples.AdvancedExamples
             }
             shaders.Clear();
         }
-        protected virtual void OnBeforeUse()
-        {
-
-        }
         public virtual void Use()
         {
             OnBeforeUse();
             GL.UseProgram(Handle);
         }
+        protected virtual void OnBeforeUse() { }
         #endregion
     }
 }

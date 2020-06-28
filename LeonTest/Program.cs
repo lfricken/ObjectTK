@@ -20,7 +20,7 @@ namespace LeonTest
 
             // A simple vertex shader possible. Just passes through the position vector.
             const string VertexShaderSource =
-            @"#version 330
+            @"#version 440
 // type
             uniform mat4 transform;
 
@@ -35,7 +35,7 @@ namespace LeonTest
 
             // A simple fragment shader. Just a constant red color.
             const string FragmentShaderSource =
-            @"#version 330
+            @"#version 440
 // type
             out vec4 outputColor;
             void main(void)
@@ -44,17 +44,16 @@ namespace LeonTest
             }
         ";
 
-            QuadBatch<SpriteProgram, SpriteData, SpriteVertex> batch;
 
             protected override unsafe void OnLoad(EventArgs e)
             {
                 {
-                    var shader = new SpriteProgram(new Vector2(800, 800));
-                    shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
-                    shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
-                    shader.Link();
+                    batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
+                    batch.Shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
+                    batch.Shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
+                    batch.Shader.Link();
+                    batch.Shader.ScreenResolution = new Vector2(800, 800);
 
-                    batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(shader, 4);
                     batch.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 0), BottomRight = new Vector2(200, 200), });
                     batch.AddQuad(new SpriteData() { TopLeft = new Vector2(300, 300), BottomRight = new Vector2(350, 350), });
                     batch.UpdateGpu();
@@ -71,24 +70,14 @@ namespace LeonTest
                 base.OnLoad(e);
             }
 
+            QuadBatch<SpriteProgram, SpriteData, SpriteVertex> batch;
             protected override void OnUnload(EventArgs e)
             {
                 batch.Dispose();
                 base.OnUnload(e);
             }
 
-            protected override void OnResize(EventArgs e)
-            {
-                // Resize the viewport to match the window size.
-                GL.Viewport(0, 0, Width, Height);
-                base.OnResize(e);
-
-                if (Width > 1000)
-                {
-                    batch.RemoveQuad(new QuadHandle() { index = 1 });
-                    batch.UpdateGpu();
-                }
-            }
+            protected override void OnResize(EventArgs e) { GL.Viewport(0, 0, Width, Height); base.OnResize(e); }
 
             protected override void OnRenderFrame(FrameEventArgs e)
             {

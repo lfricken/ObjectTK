@@ -7,17 +7,13 @@ namespace Examples.AdvancedExamples
 {
     public class SpriteProgram : ShaderProgram
     {
-        public SpriteProgram(Vector2 res)
-        {
-            Resolution = res;
-        }
-
-        public Vector2 Resolution;
+        public Vector2 ScreenResolution = Vector2.Zero;
         public Matrix4 AdditionalTransform = Matrix4.Identity;
 
         protected override void OnBeforeUse()
         {
-            var transform = Matrix4.CreateOrthographicOffCenter(0, Resolution.X, Resolution.Y, 0, 0, -1);
+            Trace.Assert(ScreenResolution != Vector2.Zero);
+            var transform = Matrix4.CreateOrthographicOffCenter(0, ScreenResolution.X, ScreenResolution.Y, 0, 0, -1);
 
             {
                 var loc = GL.GetUniformLocation(Handle, "transform");
@@ -54,7 +50,7 @@ namespace Examples.AdvancedExamples
             return sizeof(SpriteVertex);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value")]
         public unsafe void SetVertAttributes(int programHandle)
         {
             var vertexStride = GetSize();

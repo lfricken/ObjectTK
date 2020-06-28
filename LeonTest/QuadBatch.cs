@@ -17,9 +17,9 @@ namespace Examples.AdvancedExamples
         public unsafe void SetVertAttributes(int programHandle);
     }
 
-    public class QuadBatch<TShader, TQuadData, TVertex> : IDisposable where TVertex : struct, IVertex<TVertex, TQuadData> where TShader : ShaderProgram
+    public class QuadBatch<TShader, TQuadData, TVertex> : IDisposable where TVertex : struct, IVertex<TVertex, TQuadData> where TShader : ShaderProgram, new()
     {
-        #region Fields
+        #region Lifecycle
         readonly List<QuadHandle> handlesToUpdate = new List<QuadHandle>();
         readonly List<QuadHandle> Handles = new List<QuadHandle>();
         readonly List<TQuadData> Data = new List<TQuadData>();
@@ -35,6 +35,39 @@ namespace Examples.AdvancedExamples
 
         const int vPerQuad = 4;
         const int iPerQuad = 6;
+        public QuadBatch(int maxQuads)
+        {
+            MaxQuads = maxQuads;
+            vArray = new TVertex[MaxQuads * vPerQuad];
+            iArray = new int[MaxQuads * iPerQuad];
+
+            Shader = new TShader();
+            vao = GL.GenVertexArray();
+            vbo = GL.GenBuffer();
+            ebo = GL.GenBuffer();
+        }
+        bool _isDisposed;
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                GL.BindVertexArray(0);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+                GL.UseProgram(0);
+
+                Shader.Dispose();
+                GL.DeleteVertexArray(vao);
+                GL.DeleteBuffer(vbo);
+                GL.DeleteBuffer(ebo);
+            }
+            _isDisposed = true;
+        }
+        ~QuadBatch()
+        {
+            Debug.Assert(_isDisposed);
+            Dispose();
+        }
         #endregion
 
 
@@ -163,44 +196,6 @@ namespace Examples.AdvancedExamples
             Shader.Use();
             // uses the EBO implicitly (actually it's in the name silly!)
             GL.DrawElements(PrimitiveType.Triangles, NumQuads * iPerQuad, DrawElementsType.UnsignedInt, 0);
-        }
-        #endregion
-
-
-
-        #region Lifecycle
-        public QuadBatch(TShader shader, int maxQuads)
-        {
-            MaxQuads = maxQuads;
-            vArray = new TVertex[MaxQuads * vPerQuad];
-            iArray = new int[MaxQuads * iPerQuad];
-
-            Shader = shader;
-            vao = GL.GenVertexArray();
-            vbo = GL.GenBuffer();
-            ebo = GL.GenBuffer();
-        }
-        bool _isDisposed;
-        public void Dispose()
-        {
-            if (!_isDisposed)
-            {
-                GL.BindVertexArray(0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-                GL.UseProgram(0);
-
-                Shader.Dispose();
-                GL.DeleteVertexArray(vao);
-                GL.DeleteBuffer(vbo);
-                GL.DeleteBuffer(ebo);
-            }
-            _isDisposed = true;
-        }
-        ~QuadBatch()
-        {
-            Debug.Assert(_isDisposed);
-            Dispose();
         }
         #endregion
     }
