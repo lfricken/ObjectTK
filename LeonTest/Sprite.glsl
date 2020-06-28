@@ -19,8 +19,6 @@ void main(void)
 
 
 #if FragmentShader
-uniform sampler2D texture0;
-
 out vec4 outputColor;
 
 void main(void)

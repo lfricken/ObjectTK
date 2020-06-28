@@ -58,6 +58,16 @@ namespace Examples.AdvancedExamples
             // attach it to the program
             GL.AttachShader(Handle, shader);
         }
+        static string GetShaderName(ShaderType type)
+        {
+            return type switch
+            {
+                ShaderType.VertexShader => nameof(ShaderType.VertexShader),
+                ShaderType.ComputeShader => nameof(ShaderType.ComputeShader),
+                ShaderType.FragmentShader => nameof(ShaderType.FragmentShader),
+                _ => nameof(ShaderType.FragmentShader),
+            };
+        }
         static int CreateShader(ShaderType type, string[] shaderCode)
         {
             var shader = GL.CreateShader(type);
@@ -65,7 +75,7 @@ namespace Examples.AdvancedExamples
             // modify it
             Trace.Assert(shaderCode[0].Contains("#version"), "The first line in the shader should be the version"); // make sure the version is first
             Trace.Assert(shaderCode[1][0] == '/', "The second line in the shader should be a comment so we can replace it with a #define"); // make sure this is a comment
-            shaderCode[1] = "#define " + Enum.GetName(typeof(ShaderType), type) + " 1";
+            shaderCode[1] = "#define " + GetShaderName(type) + " 1";
 
             // compile it
             GL.ShaderSource(shader, string.Join("\n", shaderCode));

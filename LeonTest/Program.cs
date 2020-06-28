@@ -23,7 +23,8 @@ namespace LeonTest
             // A simple vertex shader possible. Just passes through the position vector.
             const string VertexShaderSource =
             @"#version 440
-// type
+//#define VertexShader 1
+#if VertexShader
             uniform mat4 transform;
 
             in vec4 position;
@@ -33,17 +34,20 @@ namespace LeonTest
                 gl_Position = transform * position;
                 gl_Position.x += 0.4 * other;
             }
+#endif
         ";
 
             // A simple fragment shader. Just a constant red color.
             const string FragmentShaderSource =
             @"#version 440
-// type
+//#define FragmentShader 1
+#if FragmentShader
             out vec4 outputColor;
             void main(void)
             {
                 outputColor = vec4(1.0, 0.0, 0.0, 1.0);
             }
+#endif
         ";
 
 
