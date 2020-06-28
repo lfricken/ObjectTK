@@ -45,11 +45,6 @@ namespace Examples.AdvancedExamples
                 _ => throw new Exception($"bad Vertex offset in {nameof(GenVertex)}"),
             };
         }
-        public unsafe int GetSize()
-        {
-            return sizeof(SpriteVertex);
-        }
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value")]
         public unsafe void SetVertAttributes(int programHandle)
         {
@@ -70,6 +65,10 @@ namespace Examples.AdvancedExamples
                 GL.EnableVertexAttribArray(layoutLocation);
                 total += sizeof(float);
             }
+        }
+        public unsafe int GetSize()
+        {
+            return sizeof(SpriteVertex);
         }
     }
 }

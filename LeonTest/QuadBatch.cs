@@ -26,15 +26,15 @@ namespace Examples.AdvancedExamples
         readonly int MaxQuads;
         int NumQuads { get { return Handles.Count; } }
 
+        readonly TVertex[] vArray; readonly int vPerQuad = 4;
+        readonly int[] iArray; readonly int iPerQuad = 6;
 
-        public TShader Shader;
+        // disposed
         readonly int vao;
-        readonly int vbo; readonly TVertex[] vArray;
-        readonly int ebo; readonly int[] iArray;
+        readonly int vbo;
+        readonly int ebo;
+        public TShader Shader;
 
-
-        const int vPerQuad = 4;
-        const int iPerQuad = 6;
         public QuadBatch(int maxQuads)
         {
             MaxQuads = maxQuads;
@@ -51,15 +51,10 @@ namespace Examples.AdvancedExamples
         {
             if (!_isDisposed)
             {
-                GL.BindVertexArray(0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-                GL.UseProgram(0);
-
-                Shader.Dispose();
                 GL.DeleteVertexArray(vao);
                 GL.DeleteBuffer(vbo);
                 GL.DeleteBuffer(ebo);
+                Shader.Dispose();
             }
             _isDisposed = true;
         }
@@ -175,12 +170,11 @@ namespace Examples.AdvancedExamples
             // VAO
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            var size = new IntPtr(vArray.Length * new TVertex().GetSize());
-            GL.BufferData(BufferTarget.ArrayBuffer, size, vArray, BufferUsageHint.StaticDraw);
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, new IntPtr(iArray.Length * sizeof(int)), iArray, BufferUsageHint.StaticDraw);
 
+
+            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(vArray.Length * new TVertex().GetSize()), vArray, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, new IntPtr(iArray.Length * sizeof(int)), iArray, BufferUsageHint.StaticDraw);
             new TVertex().SetVertAttributes(Shader.Handle);
 
 
