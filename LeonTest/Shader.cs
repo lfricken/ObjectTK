@@ -69,10 +69,22 @@ namespace Examples.AdvancedExamples
 
             foreach (var shader in shaders)
             {
-                // GL.DeleteShader(shader);
+                GL.DeleteShader(shader);
             }
             shaders.Clear();
         }
+
+
+        protected virtual void OnBeforeUse()
+        {
+
+        }
+        public virtual void Use()
+        {
+            OnBeforeUse();
+            GL.UseProgram(Handle);
+        }
+
 
 
         #region Lifecycle
@@ -92,7 +104,7 @@ namespace Examples.AdvancedExamples
         }
         ~ShaderProgram()
         {
-            Debug.Assert(_isDisposed);
+            Trace.Assert(_isDisposed);
             Dispose();
         }
         #endregion

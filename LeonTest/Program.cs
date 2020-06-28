@@ -2,6 +2,7 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Diagnostics;
 
 namespace LeonTest
 {
@@ -26,14 +27,14 @@ namespace LeonTest
             const string VertexShaderSource =
             @"#version 330
 // type
-
+            uniform mat4 transform;
 
             in vec4 position;
-
-            uniform float CenterMass;
+            in float other;
             void main(void)
             {
-                gl_Position = position;
+                gl_Position = transform * position;
+                gl_Position.x += 0.4 * other;
             }
         ";
 
@@ -49,31 +50,64 @@ namespace LeonTest
         ";
 
 
-            static int vertComponents = 3;//number of components per generic vertex attribute
-            static int SizeOfPoint = vertComponents * sizeof(float);
-            static int vboStride = SizeOfPoint; // + other objects
+            public interface IVertex
+            {
+                public unsafe void SetVertAttributes(int programHandle);
+            }
 
-            // Points of a triangle in normalized device coordinates.
-            readonly float[] Points = new float[] {
-                 0.1f,  0.1f, 0.0f,  // top right
-                 0.1f, -0.1f, 0.0f,  // bottom right
-                -0.1f, -0.1f, 0.0f,  // bottom left
-                -0.1f,  0.1f, 0.0f   // top left 
+
+            public struct Vertex : IVertex
+            {
+                public Vector2 position;
+                public float other;
+
+                public unsafe void SetVertAttributes(int programHandle)
+                {
+                    var vertexStride = sizeof(Vertex);
+                    int total = 0;
+                    {
+                        var numAttribs = 2;
+                        var layoutLocation = GL.GetAttribLocation(programHandle, nameof(position));
+                        GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
+                        GL.EnableVertexAttribArray(layoutLocation);
+                        total += sizeof(Vector2);
+                    }
+
+                    {
+                        var numAttribs = 1;
+                        var layoutLocation = GL.GetAttribLocation(programHandle, nameof(other));
+                        GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
+                        GL.EnableVertexAttribArray(layoutLocation);
+                        total += sizeof(float);
+                    }
+                }
+            }
+
+
+
+            // vArray of a triangle in normalized device coordinates.
+            readonly Vertex[] vArray = new Vertex[]
+            {
+                 new Vertex() { position = new Vector2(0, 0), other = 0 },  // top right
+                 new Vertex() { position = new Vector2(100, 0), other = 0 },  // top right
+                 new Vertex() { position = new Vector2(100, 100), other = 0 },  // top right
+                 new Vertex() { position = new Vector2(0, 100), other = 0.1f },  // top right
             };
 
-            readonly int[] indices = new int[] {  // note that we start from 0!
+            // note that we start from 0!
+            readonly int[] indices = new int[]
+            {
                 0, 1, 2,   // first triangle
-                0, 2, 3,   // second triangle
+                0, 2, 3,
             };
 
-            int VertexShader;
-            int FragmentShader;
-            int ShaderProgram;
+            ShaderProgram ShaderProgram;
             int vao;
             int vbo;
             int ebo;
+            Matrix4 transform = QuadBatch.GenerateSpriteTransform(new Vector2(800, 800));
 
-            protected override void OnLoad(EventArgs e)
+            protected override unsafe void OnLoad(EventArgs e)
             {
                 // shaders
                 {
@@ -82,7 +116,7 @@ namespace LeonTest
                     shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
                     shader.Link();
 
-                    ShaderProgram = shader.Handle;
+                    ShaderProgram = shader;
                 }
 
 
@@ -97,12 +131,16 @@ namespace LeonTest
                     GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
 
-                    GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(Points.Length * sizeof(float)), Points, BufferUsageHint.StaticDraw);
+                    GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(vArray.Length * sizeof(Vertex)), vArray, BufferUsageHint.StaticDraw);
                     GL.BufferData(BufferTarget.ElementArrayBuffer, new IntPtr(indices.Length * sizeof(int)), indices, BufferUsageHint.StaticDraw);
 
-                    var positionLocation = GL.GetAttribLocation(ShaderProgram, "position");
-                    GL.VertexAttribPointer(positionLocation, vertComponents, VertexAttribPointerType.Float, false, vboStride, 0);
-                    GL.EnableVertexAttribArray(positionLocation);
+                    new Vertex().SetVertAttributes(ShaderProgram.Handle);
+
+                    {
+                        var loc = GL.GetUniformLocation(ShaderProgram.Handle, "transform");
+                        Trace.Assert(loc != -1);
+                        GL.ProgramUniformMatrix4(ShaderProgram.Handle, loc, false, ref transform);
+                    }
 
                     // unbind for sanity so we don't accidentally write later
                     GL.BindVertexArray(0);
@@ -162,9 +200,6 @@ namespace LeonTest
                 GL.DeleteVertexArray(vao);
                 GL.DeleteBuffer(vbo);
                 GL.DeleteBuffer(ebo);
-                GL.DeleteProgram(ShaderProgram);
-                GL.DeleteShader(FragmentShader);
-                GL.DeleteShader(VertexShader);
 
                 base.OnUnload(e);
             }
@@ -180,9 +215,9 @@ namespace LeonTest
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                GL.UseProgram(ShaderProgram);
                 GL.BindVertexArray(vao);
 
+                ShaderProgram.Use();
                 // uses the EBO implicitly (actually it's in the name silly!)
                 GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
