@@ -55,10 +55,7 @@ namespace LeonTest
             {
                 {
                     batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch.Shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
-                    batch.Shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
-                    batch.Shader.Link();
-                    batch.Shader.ScreenResolution = new Vector2(800, 800);
+                    batch.Shader.Make(new Vector2(800, 800));
 
                     batch.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 0), BottomRight = new Vector2(200, 200), });
                     batch.AddQuad(new SpriteData() { TopLeft = new Vector2(300, 300), BottomRight = new Vector2(350, 350), });
@@ -66,10 +63,7 @@ namespace LeonTest
                 }
                 {
                     batch2 = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch2.Shader.Attach(ShaderType.VertexShader, VertexShaderSource.Split("\r\n"));
-                    batch2.Shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
-                    batch2.Shader.Link();
-                    batch2.Shader.ScreenResolution = new Vector2(800, 800);
+                    batch2.Shader.Make(new Vector2(800, 800));
 
                     batch2.AddQuad(new SpriteData() { TopLeft = new Vector2(400, 0), BottomRight = new Vector2(500, 200), });
                     batch2.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 500), BottomRight = new Vector2(100, 600), });
