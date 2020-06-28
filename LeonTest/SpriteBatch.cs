@@ -1,18 +1,44 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Diagnostics;
 
 namespace Examples.AdvancedExamples
 {
-
-    public class SpriteBatch : QuadBatch<SpriteData, SpriteVertex>
+    public class SpriteProgram : ShaderProgram
     {
-        public SpriteBatch(SpriteProgram shader, int maxQuads) : base(shader, maxQuads)
+        public SpriteProgram(Vector2 res)
         {
-
+            Resolution = res;
         }
 
-        protected override SpriteVertex GenVertex(SpriteData data, int offset)
+        public Vector2 Resolution;
+        public Matrix4 AdditionalTransform = Matrix4.Identity;
+
+        protected override void OnBeforeUse()
+        {
+            var transform = Matrix4.CreateOrthographicOffCenter(0, Resolution.X, Resolution.Y, 0, 0, -1);
+
+            {
+                var loc = GL.GetUniformLocation(Handle, "transform");
+                Trace.Assert(loc != -1, "\"transform\" was not found in the shader");
+                GL.ProgramUniformMatrix4(Handle, loc, false, ref transform);
+            }
+        }
+    }
+
+    public struct SpriteData
+    {
+        public Vector2 TopLeft;
+        public Vector2 BottomRight;
+    }
+
+    public struct SpriteVertex : IVertex<SpriteVertex, SpriteData>
+    {
+        public Vector2 position;
+        public float other;
+
+        public unsafe SpriteVertex GenVertex(SpriteData data, int offset)
         {
             return offset switch
             {
@@ -23,22 +49,12 @@ namespace Examples.AdvancedExamples
                 _ => throw new Exception($"bad Vertex offset in {nameof(GenVertex)}"),
             };
         }
-    }
-    public struct SpriteData
-    {
-        public Vector2 TopLeft;
-        public Vector2 BottomRight;
-    }
-
-    public struct SpriteVertex : IVertex
-    {
-        public Vector2 position;
-        public float other;
-
         public unsafe int GetSize()
         {
             return sizeof(SpriteVertex);
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public unsafe void SetVertAttributes(int programHandle)
         {
             var vertexStride = GetSize();

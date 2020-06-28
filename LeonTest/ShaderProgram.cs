@@ -7,20 +7,44 @@ namespace Examples.AdvancedExamples
 {
     public class ShaderProgram : IDisposable
     {
+        #region Lifecycle
         public readonly int Handle;
-        private List<int> shaders = new List<int>();
-
+        readonly List<int> shaders = new List<int>();
         public ShaderProgram()
         {
             Handle = GL.CreateProgram();
         }
 
+
+
+        bool _isDisposed;
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+                GL.DeleteProgram(Handle);
+
+                foreach (var shader in shaders)
+                {
+                    GL.DeleteShader(shader);
+                }
+            }
+            _isDisposed = true;
+        }
+        ~ShaderProgram()
+        {
+            Trace.Assert(_isDisposed);
+            Dispose();
+        }
+        #endregion
+
+
+
+        #region API
         public int GetLocation(string name)
         {
             return GL.GetAttribLocation(Handle, name);
         }
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -37,9 +61,7 @@ namespace Examples.AdvancedExamples
             // attach it to the program
             GL.AttachShader(Handle, shader);
         }
-
-
-        private static int CreateShader(ShaderType type, string[] shaderCode)
+        static int CreateShader(ShaderType type, string[] shaderCode)
         {
             var shader = GL.CreateShader(type);
 
@@ -62,7 +84,6 @@ namespace Examples.AdvancedExamples
 
             return shader;
         }
-
         public void Link()
         {
             GL.LinkProgram(Handle);
@@ -73,8 +94,6 @@ namespace Examples.AdvancedExamples
             }
             shaders.Clear();
         }
-
-
         protected virtual void OnBeforeUse()
         {
 
@@ -83,29 +102,6 @@ namespace Examples.AdvancedExamples
         {
             OnBeforeUse();
             GL.UseProgram(Handle);
-        }
-
-
-
-        #region Lifecycle
-        bool _isDisposed;
-        public void Dispose()
-        {
-            if (!_isDisposed)
-            {
-                GL.DeleteProgram(Handle);
-
-                foreach (var shader in shaders)
-                {
-                    GL.DeleteShader(shader);
-                }
-            }
-            _isDisposed = true;
-        }
-        ~ShaderProgram()
-        {
-            Trace.Assert(_isDisposed);
-            Dispose();
         }
         #endregion
     }

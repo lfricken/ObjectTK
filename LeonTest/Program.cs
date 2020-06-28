@@ -44,16 +44,7 @@ namespace LeonTest
             }
         ";
 
-            SpriteBatch batch;
-
-            // vArray of a triangle in normalized device coordinates.
-            readonly IVertex[] vArray = new IVertex[]
-            {
-                 new SpriteVertex() { position = new Vector2(0, 0), other = 0 },  // top right
-                 new SpriteVertex() { position = new Vector2(100, 0), other = 0 },  // top right
-                 new SpriteVertex() { position = new Vector2(100, 100), other = 0 },  // top right
-                 new SpriteVertex() { position = new Vector2(0, 100), other = 0.1f },  // top right
-            };
+            QuadBatch<SpriteProgram, SpriteData, SpriteVertex> batch;
 
             protected override unsafe void OnLoad(EventArgs e)
             {
@@ -63,16 +54,16 @@ namespace LeonTest
                     shader.Attach(ShaderType.FragmentShader, FragmentShaderSource.Split("\r\n"));
                     shader.Link();
 
-                    batch = new SpriteBatch(shader, 1);
-
-                    batch.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 0), BottomRight = new Vector2(100, 100), });
-
+                    batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(shader, 4);
+                    batch.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 0), BottomRight = new Vector2(200, 200), });
+                    batch.AddQuad(new SpriteData() { TopLeft = new Vector2(300, 300), BottomRight = new Vector2(350, 350), });
                     batch.UpdateGpu();
                 }
 
 
                 // random final setup
                 {
+                    GL.FrontFace(FrontFaceDirection.Cw);
                     GL.PolygonMode(MaterialFace.Back, PolygonMode.Line); // make draw with lines if drawing backs
                     GL.ClearColor(0.0f, 0.0f, 1.0f, 0.0f); // set clear color
                 }
@@ -91,6 +82,12 @@ namespace LeonTest
                 // Resize the viewport to match the window size.
                 GL.Viewport(0, 0, Width, Height);
                 base.OnResize(e);
+
+                if (Width > 1000)
+                {
+                    batch.RemoveQuad(new QuadHandle() { index = 1 });
+                    batch.UpdateGpu();
+                }
             }
 
             protected override void OnRenderFrame(FrameEventArgs e)
