@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 
 namespace Examples.AdvancedExamples
 {
@@ -39,7 +38,7 @@ namespace Examples.AdvancedExamples
 
 
         #region API
-        protected int GetLocation(string name)
+        public int GetLocation(string name)
         {
             return GL.GetAttribLocation(Handle, name);
         }
@@ -51,10 +50,9 @@ namespace Examples.AdvancedExamples
         /// The 0th line should be the version
         /// The 1st line should be a comment so we can insert a #define for the type
         /// </param>
-        protected void Attach(ShaderType type, string fullPathToCode)
+        public void Attach(ShaderType type, string[] shaderCode)
         {
-            var code = File.ReadAllLines(fullPathToCode);
-            var shader = CreateShader(type, code);
+            var shader = CreateShader(type, shaderCode);
             shaders.Add(shader);
 
             // attach it to the program
@@ -83,7 +81,7 @@ namespace Examples.AdvancedExamples
 
             return shader;
         }
-        protected void Link()
+        public void Link()
         {
             GL.LinkProgram(Handle);
 

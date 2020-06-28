@@ -10,17 +10,6 @@ namespace Examples.AdvancedExamples
         public Vector2 ScreenResolution = Vector2.Zero;
         public Matrix4 AdditionalTransform = Matrix4.Identity;
 
-        public void Make(Vector2 screenResolution)
-        {
-            const string codePath = "../../../Sprite.glsl";
-            ScreenResolution = screenResolution;
-
-            Attach(ShaderType.VertexShader, codePath);
-            Attach(ShaderType.FragmentShader, codePath);
-            Link();
-        }
-
-
         protected override void OnBeforeUse()
         {
             Trace.Assert(ScreenResolution != Vector2.Zero);
@@ -64,7 +53,6 @@ namespace Examples.AdvancedExamples
             {
                 var numAttribs = 2;
                 var layoutLocation = GL.GetAttribLocation(programHandle, nameof(position));
-                Trace.Assert(layoutLocation != -1, "\"position\" was not found in the shader");
                 GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
                 GL.EnableVertexAttribArray(layoutLocation);
                 total += sizeof(Vector2);
@@ -73,7 +61,6 @@ namespace Examples.AdvancedExamples
             {
                 var numAttribs = 1;
                 var layoutLocation = GL.GetAttribLocation(programHandle, nameof(other));
-                Trace.Assert(layoutLocation != -1, "\"other\" was not found in the shader");
                 GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
                 GL.EnableVertexAttribArray(layoutLocation);
                 total += sizeof(float);
