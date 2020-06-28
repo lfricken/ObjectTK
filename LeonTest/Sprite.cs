@@ -9,6 +9,7 @@ namespace Examples.AdvancedExamples
     {
         public Vector2 ScreenResolution = Vector2.Zero;
         public Matrix4 AdditionalTransform = Matrix4.Identity;
+        //public Texture2D
 
         public void Make(Vector2 screenResolution)
         {
@@ -44,6 +45,7 @@ namespace Examples.AdvancedExamples
     {
         public Vector2 position;
         public float other;
+        public Vector2 _texCoord;
 
         public unsafe SpriteVertex GenVertex(SpriteData data, int offset)
         {
@@ -77,6 +79,15 @@ namespace Examples.AdvancedExamples
                 GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
                 GL.EnableVertexAttribArray(layoutLocation);
                 total += sizeof(float);
+            }
+
+            { //_texCoord
+                var numAttribs = 2;
+                var layoutLocation = GL.GetAttribLocation(programHandle, nameof(_texCoord));
+                Trace.Assert(layoutLocation != -1, "\"_texCoord\" was not found in the shader");
+                GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
+                GL.EnableVertexAttribArray(layoutLocation);
+                total += sizeof(Vector2);
             }
         }
         public unsafe int GetSize()

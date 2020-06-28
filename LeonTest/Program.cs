@@ -2,8 +2,13 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace LeonTest
 {
@@ -20,8 +25,32 @@ namespace LeonTest
         {
             public Game() : base(800, 800) { }
 
+            public void LoadTex()
+            {
+                //Load the image
+                Image<Rgba32> image = Image.Load<Rgba32>("green.png");
+
+                //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
+                //This will correct that, making the texture display properly.
+                image.Mutate(x => x.Flip(FlipMode.Vertical));
+
+                //Get an array of the pixels, in ImageSharp's internal format.
+                image.TryGetSinglePixelSpan(out var span);
+                Rgba32[] pixels = span.ToArray();
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            }
+
+
             protected override unsafe void OnLoad(EventArgs e)
             {
+                LoadTex();
+
                 {
                     batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
                     batch.Shader.Make(new Vector2(800, 800));
