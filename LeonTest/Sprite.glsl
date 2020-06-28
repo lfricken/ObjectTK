@@ -3,7 +3,7 @@
 
 
 
-#if VertexShader
+#if TypeIs_VertexShader
 uniform mat4 transform;
 
 in vec4 position;
@@ -18,7 +18,7 @@ void main(void)
 
 
 
-#if FragmentShader
+#if TypeIs_FragmentShader
 out vec4 outputColor;
 
 void main(void)
