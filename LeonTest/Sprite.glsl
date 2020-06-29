@@ -4,19 +4,18 @@
 
 
 #if TypeIs_VertexShader
-uniform mat4 transform;
+uniform mat4 writeTransform;
+uniform vec2 readTransform;
 
 in vec4 position;
-in float other;
 in vec2 _texCoord;
 
 out vec2 texCoord;
 
 void main(void)
 {
-    texCoord = _texCoord;
-    gl_Position = transform * position;
-    gl_Position.x += 0.4 * other;
+    texCoord = readTransform * _texCoord;
+    gl_Position = writeTransform * position;
 }
 #endif
 
@@ -24,6 +23,7 @@ void main(void)
 
 #if TypeIs_FragmentShader
 uniform sampler2D texture0;
+uniform sampler2D texture1;
 
 in vec2 texCoord;
 
@@ -31,6 +31,7 @@ out vec4 outputColor;
 
 void main(void)
 {
-    outputColor = texture(texture0, texCoord);
+    vec4 x = texture(texture0, texCoord);
+    outputColor = texture(texture1, texCoord);
 }
 #endif

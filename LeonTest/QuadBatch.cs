@@ -46,7 +46,6 @@ namespace Examples.AdvancedExamples
             vbo = GL.GenBuffer();
             ebo = GL.GenBuffer();
         }
-        bool _isDisposed;
         public void Dispose()
         {
             if (!_isDisposed)
@@ -58,6 +57,7 @@ namespace Examples.AdvancedExamples
             }
             _isDisposed = true;
         }
+        bool _isDisposed;
         ~QuadBatch()
         {
             Debug.Assert(_isDisposed);

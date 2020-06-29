@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using LeonTest;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Diagnostics;
@@ -9,52 +10,70 @@ namespace Examples.AdvancedExamples
     {
         public Vector2 ScreenResolution = Vector2.Zero;
         public Matrix4 AdditionalTransform = Matrix4.Identity;
-        //public Texture2D
+        Vector2 TextureResolution;
+        public Texture Texture { get; protected set; }
 
-        public void Make(Vector2 screenResolution)
+        public void Make(Vector2 screenResolution, Vector2 textureRes, Texture texture)
         {
+            Texture = texture;
+            TextureResolution = textureRes;
+
             const string codePath = "../../../Sprite.glsl";
             ScreenResolution = screenResolution;
 
             Attach(ShaderType.VertexShader, codePath);
             Attach(ShaderType.FragmentShader, codePath);
+            AssignTextureUnit("texture1", 1);
             Link();
         }
 
 
         protected override void OnBeforeUse()
         {
-            Trace.Assert(ScreenResolution != Vector2.Zero);
-            var transform = Matrix4.CreateOrthographicOffCenter(0, ScreenResolution.X, ScreenResolution.Y, 0, 0, -1);
 
             {
-                var loc = GL.GetUniformLocation(Handle, "transform");
-                Trace.Assert(loc != -1, "\"transform\" was not found in the shader");
-                GL.ProgramUniformMatrix4(Handle, loc, false, ref transform);
+                Trace.Assert(ScreenResolution != Vector2.Zero);
+                var writeTransform = Matrix4.CreateOrthographicOffCenter(0, ScreenResolution.X, ScreenResolution.Y, 0, 0, -1);
+                var loc = GL.GetUniformLocation(Handle, "writeTransform");
+                Trace.Assert(loc != -1, "\"writeTransform\" was not found in the shader");
+                GL.ProgramUniformMatrix4(Handle, loc, false, ref writeTransform);
             }
+            {
+                var readTransform = new Vector2(1f / TextureResolution.X, 1f / TextureResolution.Y);
+                var loc = GL.GetUniformLocation(Handle, "readTransform");
+                Trace.Assert(loc != -1, "\"readTransform\" was not found in the shader");
+                GL.ProgramUniform2(Handle, loc, ref readTransform);
+            }
+
+            Texture.SetAs(TextureUnit.Texture0);
         }
     }
 
     public struct SpriteData
     {
-        public Vector2 TopLeft;
-        public Vector2 BottomRight;
+        public SpriteData(Rectangle write, Rectangle read)
+        {
+            WriteCoords = write;
+            ReadCoords = read;
+        }
+
+        public Rectangle WriteCoords;
+        public Rectangle ReadCoords;
     }
 
     public struct SpriteVertex : IVertex<SpriteVertex, SpriteData>
     {
         public Vector2 position;
-        public float other;
         public Vector2 _texCoord;
 
         public unsafe SpriteVertex GenVertex(SpriteData data, int offset)
         {
             return offset switch
             {
-                0 => new SpriteVertex() { position = data.TopLeft, other = 0, },
-                1 => new SpriteVertex() { position = new Vector2(data.BottomRight.X, data.TopLeft.Y), other = 0, },
-                2 => new SpriteVertex() { position = data.BottomRight, other = 0, },
-                3 => new SpriteVertex() { position = new Vector2(data.TopLeft.X, data.BottomRight.Y), other = 0, },
+                0 => new SpriteVertex() { position = data.WriteCoords.TopLeft(), _texCoord = data.ReadCoords.TopLeft(), },
+                1 => new SpriteVertex() { position = data.WriteCoords.TopRight(), _texCoord = data.ReadCoords.TopRight(), },
+                2 => new SpriteVertex() { position = data.WriteCoords.BotRight(), _texCoord = data.ReadCoords.BotRight(), },
+                3 => new SpriteVertex() { position = data.WriteCoords.BotLeft(), _texCoord = data.ReadCoords.BotLeft(), },
                 _ => throw new Exception($"bad Vertex offset in {nameof(GenVertex)}"),
             };
         }
@@ -70,15 +89,6 @@ namespace Examples.AdvancedExamples
                 GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
                 GL.EnableVertexAttribArray(layoutLocation);
                 total += sizeof(Vector2);
-            }
-
-            {
-                var numAttribs = 1;
-                var layoutLocation = GL.GetAttribLocation(programHandle, nameof(other));
-                Trace.Assert(layoutLocation != -1, "\"other\" was not found in the shader");
-                GL.VertexAttribPointer(layoutLocation, numAttribs, VertexAttribPointerType.Float, false, vertexStride, total);
-                GL.EnableVertexAttribArray(layoutLocation);
-                total += sizeof(float);
             }
 
             { //_texCoord

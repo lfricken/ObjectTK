@@ -2,18 +2,32 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Image = SixLabors.ImageSharp.Image;
 
 namespace LeonTest
 {
-    class Program
+    public static class Program
     {
+        public static Vector2 TopLeft(this Rectangle rect)
+        {
+            return new Vector2(rect.Left, rect.Top);
+        }
+        public static Vector2 TopRight(this Rectangle rect)
+        {
+            return new Vector2(rect.Right, rect.Top);
+        }
+        public static Vector2 BotRight(this Rectangle rect)
+        {
+            return new Vector2(rect.Right, rect.Bottom);
+        }
+        public static Vector2 BotLeft(this Rectangle rect)
+        {
+            return new Vector2(rect.Left, rect.Bottom);
+        }
+
         static void Main(string[] args)
         {
             using (Game game = new Game())
@@ -27,23 +41,10 @@ namespace LeonTest
 
             public void LoadTex()
             {
-                //Load the image
-                Image<Rgba32> image = Image.Load<Rgba32>("green.png");
-
-                //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
-                //This will correct that, making the texture display properly.
-                image.Mutate(x => x.Flip(FlipMode.Vertical));
-
-                //Get an array of the pixels, in ImageSharp's internal format.
-                image.TryGetSinglePixelSpan(out var span);
-                Rgba32[] pixels = span.ToArray();
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             }
 
 
@@ -51,20 +52,23 @@ namespace LeonTest
             {
                 LoadTex();
 
+                var green = new Texture("green.png");
+                var red = new Texture("red.png");
+
                 {
                     batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch.Shader.Make(new Vector2(800, 800));
+                    batch.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), green);
 
-                    batch.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 0), BottomRight = new Vector2(200, 200), });
-                    batch.AddQuad(new SpriteData() { TopLeft = new Vector2(300, 300), BottomRight = new Vector2(350, 350), });
+                    batch.AddQuad(new SpriteData(new Rectangle(new Point(0, 0), new Size(200, 200)), new Rectangle(new Point(0, 0), new Size(200, 200))));
+                    batch.AddQuad(new SpriteData(new Rectangle(new Point(300, 0), new Size(200, 200)), new Rectangle(new Point(100, 100), new Size(200, 200))));
                     batch.UpdateGpu();
                 }
                 {
                     batch2 = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch2.Shader.Make(new Vector2(800, 800));
+                    batch2.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), red);
 
-                    batch2.AddQuad(new SpriteData() { TopLeft = new Vector2(400, 0), BottomRight = new Vector2(500, 200), });
-                    batch2.AddQuad(new SpriteData() { TopLeft = new Vector2(0, 500), BottomRight = new Vector2(100, 600), });
+                    batch2.AddQuad(new SpriteData(new Rectangle(new Point(0, 300), new Size(200, 200)), new Rectangle(new Point(0, 0), new Size(200, 200))));
+                    batch2.AddQuad(new SpriteData(new Rectangle(new Point(300, 300), new Size(200, 200)), new Rectangle(new Point(100, 100), new Size(200, 200))));
                     batch2.UpdateGpu();
                 }
 
@@ -78,7 +82,18 @@ namespace LeonTest
                     GL.PolygonMode(MaterialFace.Back, PolygonMode.Line); // make draw with lines if drawing backs
                     //GL.ClearColor(0.0f, 0.0f, 1.0f, 0.0f); // set clear color
                 }
-
+                int total = 0;
+                for (int currentNumber = 1; currentNumber < 1000; currentNumber++)
+                {
+                    int iMod3 = currentNumber % 3;
+                    int iMod5 = currentNumber % 5;
+                    bool isDivisibleBy3 = iMod3 == 0;
+                    bool isDivisibleBy5 = iMod5 == 0;
+                    if (isDivisibleBy3 || isDivisibleBy5)
+                    {
+                        total += currentNumber;
+                    }
+                }
                 base.OnLoad(e);
             }
 
