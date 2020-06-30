@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -186,7 +187,6 @@ namespace Examples.AdvancedExamples
         public void Draw()
         {
             GL.BindVertexArray(vao);
-
             Shader.Use();
             // uses the EBO implicitly (actually it's in the name silly!)
             GL.DrawElements(PrimitiveType.Triangles, NumQuads * iPerQuad, DrawElementsType.UnsignedInt, 0);

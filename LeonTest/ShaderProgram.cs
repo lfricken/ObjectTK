@@ -36,14 +36,15 @@ namespace Examples.AdvancedExamples
         }
         #endregion
 
-        public void AssignTextureUnit(string textureName, int textureUnit)
-        {
-            int location = GL.GetUniformLocation(Handle, textureName);
 
-            GL.Uniform1(location, textureUnit);
-        }
 
         #region API
+        protected void AssignTextureUnit(string textureName, int textureUnit)
+        {
+            int location = GL.GetUniformLocation(Handle, textureName);
+            Trace.Assert(location != -1);
+            GL.ProgramUniform1(Handle, location, textureUnit);
+        }
         protected int GetLocation(string name)
         {
             return GL.GetAttribLocation(Handle, name);

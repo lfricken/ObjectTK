@@ -8,13 +8,13 @@ uniform mat4 writeTransform;
 uniform vec2 readTransform;
 
 in vec4 position;
-in vec2 _texCoord;
+in vec2 texCoord;
 
-out vec2 texCoord;
+out vec2 fragTexCoord;
 
 void main(void)
 {
-    texCoord = readTransform * _texCoord;
+    fragTexCoord = readTransform * texCoord;
     gl_Position = writeTransform * position;
 }
 #endif
@@ -25,13 +25,12 @@ void main(void)
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 
-in vec2 texCoord;
+in vec2 fragTexCoord;
 
 out vec4 outputColor;
 
 void main(void)
 {
-    vec4 x = texture(texture0, texCoord);
-    outputColor = texture(texture1, texCoord);
+    outputColor = mix(texture(texture1, fragTexCoord), texture(texture0, fragTexCoord), 0.8);
 }
 #endif

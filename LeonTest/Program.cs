@@ -57,7 +57,7 @@ namespace LeonTest
 
                 {
                     batch = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), green);
+                    batch.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), green, red);
 
                     batch.AddQuad(new SpriteData(new Rectangle(new Point(0, 0), new Size(200, 200)), new Rectangle(new Point(0, 0), new Size(200, 200))));
                     batch.AddQuad(new SpriteData(new Rectangle(new Point(300, 0), new Size(200, 200)), new Rectangle(new Point(100, 100), new Size(200, 200))));
@@ -65,7 +65,7 @@ namespace LeonTest
                 }
                 {
                     batch2 = new QuadBatch<SpriteProgram, SpriteData, SpriteVertex>(4);
-                    batch2.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), red);
+                    batch2.Shader.Make(new Vector2(800, 800), new Vector2(338, 338), red, green);
 
                     batch2.AddQuad(new SpriteData(new Rectangle(new Point(0, 300), new Size(200, 200)), new Rectangle(new Point(0, 0), new Size(200, 200))));
                     batch2.AddQuad(new SpriteData(new Rectangle(new Point(300, 300), new Size(200, 200)), new Rectangle(new Point(100, 100), new Size(200, 200))));
@@ -95,7 +95,11 @@ namespace LeonTest
                     }
                 }
                 base.OnLoad(e);
+
+                transform = Matrix4.CreateTranslation(new Vector3(100, 10, 0));
             }
+
+            Matrix4 transform;
 
             QuadBatch<SpriteProgram, SpriteData, SpriteVertex> batch;
             QuadBatch<SpriteProgram, SpriteData, SpriteVertex> batch2;
@@ -124,8 +128,11 @@ namespace LeonTest
 
                 //GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                batch2.Draw();
+                batch.Shader.AdditionalTransform = transform;
                 batch.Draw();
+
+                batch2.Shader.AdditionalTransform = transform;
+                batch2.Draw();
                 Context.SwapBuffers();
 
                 // Swap the front/back buffers so what we just rendered to the back buffer is displayed in the window.
